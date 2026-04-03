@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>青青總控台</title>
+<title>青青專屬助理</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,29 +28,75 @@
   --life-bg: rgba(107,163,214,0.08);
   --life-border: rgba(107,163,214,0.3);
   --bg: #FAF6F0;
-  --card-bg: #FFFFFF;
+  --card-bg: rgba(255,255,255,0.92);
   --text-dark: #3A2A14;
   --text-mid: #6B5A48;
   --text-light: #9B8B78;
   --border: rgba(184,146,74,0.15);
-  --shadow: 0 2px 20px rgba(58,42,20,0.08);
+  --shadow: 0 4px 24px rgba(58,42,20,0.12), 0 1px 6px rgba(58,42,20,0.06);
   --shadow-hover: 0 6px 28px rgba(58,42,20,0.13);
   --radius: 12px;
 }
 
 body {
   font-family: 'Noto Sans TC', sans-serif;
-  background: var(--bg);
+  background: linear-gradient(160deg, #FDFAF5 0%, #FBF6EE 25%, #F9F4EB 50%, #FBF7F0 75%, #FDFAF5 100%);
+  background-attachment: fixed;
   color: var(--text-dark);
   line-height: 1.7;
   letter-spacing: 0.04em;
   min-height: 100vh;
+  position: relative; overflow-x: hidden;
+}
+
+/* === 大理石紋路背景（整合到 body） === */
+
+/* === 卡片光暈 === */
+.day-card, .day-content > div[style*="background:var(--card-bg)"] {
+  position: relative;
+}
+.day-card::before {
+  content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px;
+  border-radius: inherit; z-index: -1;
+  background: linear-gradient(135deg, rgba(184,146,74,0.08) 0%, transparent 50%, rgba(232,139,122,0.05) 100%);
+  opacity: 0; transition: opacity 0.6s ease;
+}
+.day-card:hover::before { opacity: 1; }
+
+/* === 漸層標題 + 星芒 === */
+.section-title {
+  color: var(--text-dark);
+  position: relative; display: inline-block;
+  text-shadow: 0 0 20px rgba(184,146,74,0.3), 0 0 40px rgba(184,146,74,0.15);
+}
+.section-title::after { display: none; }
+
+/* === 滾動淡入 === */
+.scroll-reveal {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22,1,0.36,1);
+}
+.scroll-reveal.visible {
+  opacity: 1; transform: translateY(0);
+}
+
+/* === 金色粒子慶祝 === */
+.particle-burst {
+  position: fixed; pointer-events: none; z-index: 9999;
+}
+.particle {
+  position: absolute; border-radius: 50%;
+  animation: particleFly 1s ease-out forwards;
+}
+@keyframes particleFly {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
 
 /* NAV */
 .nav {
   position: sticky; top: 0; z-index: 100;
-  background: linear-gradient(135deg, rgba(242,235,224,0.96) 0%, rgba(248,242,233,0.96) 50%, rgba(244,237,226,0.96) 100%);
+  background: linear-gradient(135deg, rgba(253,252,250,0.96) 0%, rgba(250,248,245,0.94) 50%, rgba(253,252,250,0.96) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(184,146,74,0.2);
@@ -62,8 +108,21 @@ body {
 }
 .nav-brand {
   font-family: 'Noto Serif TC', serif;
-  font-size: 0.95rem; font-weight: 500; color: var(--text-mid);
-  letter-spacing: 0.06em;
+  font-size: 1.15rem; font-weight: 600; color: var(--text-dark);
+  letter-spacing: 0.08em;
+  position: relative; display: inline-flex; align-items: center;
+}
+.nav-brand::after {
+  content: '✦';
+  margin-left: 8px;
+  font-size: 0.7rem;
+  color: rgba(184,146,74,0.7);
+  text-shadow: 0 0 8px rgba(184,146,74,0.4);
+  animation: navSparkle 3s ease-in-out infinite;
+}
+@keyframes navSparkle {
+  0%, 100% { opacity: 0.5; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
 }
 .nav-right { display: flex; align-items: center; gap: 12px; }
 .nav-tabs { display: flex; gap: 4px; }
@@ -72,9 +131,17 @@ body {
   font-family: 'Noto Sans TC', sans-serif; font-size: 0.88rem;
   color: var(--text-light); cursor: pointer; border-radius: 8px;
   transition: all 0.3s ease; letter-spacing: 0.04em;
+  position: relative;
 }
 .nav-tab:hover { color: var(--text-mid); background: rgba(184,146,74,0.06); }
-.nav-tab.active { color: var(--text-dark); background: rgba(184,146,74,0.1); font-weight: 500; }
+.nav-tab.active {
+  color: var(--text-dark); background: rgba(184,146,74,0.08); font-weight: 500;
+}
+.nav-tab.active::after {
+  content: ''; position: absolute; bottom: 0; left: 20%; right: 20%;
+  height: 2.5px; border-radius: 2px;
+  background: linear-gradient(90deg, rgba(184,146,74,0.2), var(--star-primary), rgba(184,146,74,0.2));
+}
 
 .mode-toggle {
   padding: 6px 14px; border-radius: 16px; font-size: 0.78rem;
@@ -89,7 +156,7 @@ body {
   width: 32px; height: 32px; position: relative;
 }
 .mobile-nav-toggle span {
-  display: block; width: 20px; height: 2px; background: var(--text-dark);
+  display: block; width: 20px; height: 2px; background: var(--star-primary);
   position: absolute; left: 6px; transition: all 0.3s ease;
 }
 .mobile-nav-toggle span:nth-child(1) { top: 9px; }
@@ -97,63 +164,17 @@ body {
 .mobile-nav-toggle span:nth-child(3) { top: 21px; }
 
 /* MAIN */
-.main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+.main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; position: relative; z-index: 1; }
 .section { display: none; animation: fadeIn 0.6s cubic-bezier(0.22,1,0.36,1); }
 .section.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes scaleIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
-@keyframes softGlow { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-
-/* GLOW DECORATIONS */
-.glow-dot {
-  position: absolute; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, rgba(184,146,74,0.4) 0%, transparent 70%);
-  animation: softGlow 4s ease-in-out infinite;
-}
-.section-header { position: relative; }
-.section-header::after {
-  content: ''; position: absolute; top: -8px; right: 20px;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(184,146,74,0.12) 0%, transparent 70%);
-  animation: softGlow 5s ease-in-out infinite;
-  pointer-events: none;
-}
-.nav::after {
-  content: ''; position: absolute; top: 50%; right: 140px;
-  width: 60px; height: 60px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(184,146,74,0.06) 0%, transparent 70%);
-  animation: softGlow 6s ease-in-out infinite;
-  pointer-events: none;
-}
-.nav { position: sticky; top: 0; z-index: 100; /* already has position */ }
-.calendar-container::before {
-  content: ''; position: absolute; top: 10px; left: 10px;
-  width: 30px; height: 30px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(184,146,74,0.1) 0%, transparent 70%);
-  animation: softGlow 4.5s ease-in-out infinite 1s;
-  pointer-events: none;
-}
+.section-header { position: relative; z-index: 1; }
+.nav { position: sticky; top: 0; z-index: 100; }
 .calendar-container { position: relative; }
-.goal-card::after {
-  content: ''; position: absolute; top: -4px; right: 10px;
-  width: 24px; height: 24px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(184,146,74,0.15) 0%, transparent 70%);
-  animation: softGlow 3.5s ease-in-out infinite;
-  pointer-events: none;
-}
-.goal-card { position: relative; overflow: visible; }
-.brand-card::after {
-  content: ''; position: absolute; bottom: -6px; right: -6px;
-  width: 50px; height: 50px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(184,146,74,0.08) 0%, transparent 70%);
-  animation: softGlow 5s ease-in-out infinite 0.5s;
-  pointer-events: none;
-}
-.brand-card { position: relative; overflow: visible; }
 
-.section-header { margin-bottom: 28px; }
+.section-header { margin-bottom: 28px; background: rgba(255,255,255,0.95); border-radius: var(--radius); padding: 20px 24px; box-shadow: 0 4px 24px rgba(58,42,20,0.1); border: 1px solid rgba(184,146,74,0.2); }
 .section-title {
   font-family: 'Noto Serif TC', serif; font-size: 1.5rem;
   font-weight: 700; color: var(--text-dark); margin-bottom: 8px;
@@ -220,7 +241,19 @@ body {
 .progress-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .progress-label { font-size: 0.82rem; color: var(--text-mid); min-width: 80px; display: flex; align-items: center; gap: 6px; }
 .progress-bar { flex: 1; height: 8px; background: rgba(58,42,20,0.06); border-radius: 4px; overflow: hidden; }
-.progress-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+.progress-fill {
+  height: 100%; border-radius: 4px; transition: width 1s ease;
+  position: relative; overflow: hidden;
+}
+.progress-fill::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+  animation: progressShimmer 2s ease-in-out infinite;
+}
+@keyframes progressShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
 .progress-fill.zy { background: var(--zy-primary); }
 .progress-fill.personal { background: var(--personal-primary); }
 .progress-fill.star { background: var(--star-primary); }
@@ -272,22 +305,104 @@ body {
 .cal-status-tag.done { opacity: 1; }
 
 /* DAILY VIEW */
-.day-selector { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+.day-selector { margin-bottom: 24px; }
+.day-grid-wrap {
+  position: relative; overflow: hidden;
+  background: linear-gradient(165deg, #FFFFFF 0%, #FDFCFA 40%, #FAF8F5 100%);
+  border-radius: 16px; padding: 22px;
+  box-shadow: 0 6px 30px rgba(58,42,20,0.12), 0 2px 8px rgba(58,42,20,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+  border: 2px solid rgba(154,120,50,0.55);
+  max-width: 440px; margin: 0 auto;
+  border: 1px solid rgba(184,146,74,0.08);
+}
+.day-grid-wrap::before { display: none; }
+.day-grid-wrap::after { display: none; }
+@keyframes sparkle {
+  0%, 100% { opacity: 0.35; transform: scale(1) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.4) rotate(20deg); }
+}
+.day-grid-sparkles {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 2; overflow: hidden;
+}
+.day-grid-sparkles span {
+  position: absolute; color: rgba(184,146,74,0.4);
+  animation: sparkle 6s ease-in-out infinite;
+}
+.day-grid-sparkles span:nth-child(1) { top: 38%; left: 6%; font-size: 0.7rem; animation-delay: 0s; }
+.day-grid-sparkles span:nth-child(2) { top: 65%; right: 8%; animation-delay: 2s; font-size: 0.6rem; color: rgba(232,139,122,0.35); }
+.day-grid-sparkles span:nth-child(3) { top: 15%; left: 48%; animation-delay: 3.5s; font-size: 0.65rem; color: rgba(184,146,74,0.3); }
+@keyframes floatGlow {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  33% { transform: translate(15px, -10px) scale(1.1); opacity: 1; }
+  66% { transform: translate(-10px, 8px) scale(0.95); opacity: 0.7; }
+}
+.day-grid-header {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 8px;
+  border-bottom: 1px solid rgba(184,146,74,0.08); padding-bottom: 10px;
+}
+.day-grid-header span {
+  text-align: center; font-family: 'Noto Serif TC', serif; font-size: 0.82rem; font-weight: 700; color: var(--text-dark);
+  padding: 4px 0; letter-spacing: 0.1em;
+}
+.day-grid {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+}
 .day-btn {
-  padding: 8px 14px; border: 1px solid var(--border); background: var(--card-bg);
-  border-radius: 16px; font-family: 'Noto Sans TC', sans-serif; font-size: 0.82rem;
-  cursor: pointer; transition: all 0.3s ease; color: var(--text-mid);
+  position: relative; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid transparent; background: transparent;
+  border-radius: 50%; font-family: 'Noto Sans TC', sans-serif; font-size: 0.85rem;
+  cursor: pointer; transition: all 0.3s cubic-bezier(0.22,1,0.36,1); color: var(--text-mid); font-weight: 500;
+  margin: 2px auto;
 }
-.day-btn:hover { border-color: var(--star-primary); color: var(--star-primary); }
-.day-btn.active { border-color: var(--star-primary); color: var(--star-primary); font-weight: 600; background: var(--star-bg); box-shadow: 0 0 14px rgba(184,146,74,0.18); }
-.day-btn.today-btn { position: relative; box-shadow: 0 0 12px rgba(184,146,74,0.2); }
-.day-btn.today-btn::after {
-  content: ''; position: absolute; top: 4px; right: 4px;
-  width: 6px; height: 6px; border-radius: 50%; background: var(--star-primary);
-  box-shadow: 0 0 8px rgba(184,146,74,0.5);
-  animation: softGlow 3s ease-in-out infinite;
+.day-btn:hover {
+  background: rgba(184,146,74,0.1); color: var(--star-primary);
+  transform: scale(1.12); box-shadow: 0 2px 10px rgba(184,146,74,0.15);
 }
-.day-btn.has-event { border-color: var(--star-border); }
+.day-btn.active {
+  color: white; font-weight: 700;
+  background: linear-gradient(135deg, #C9A04E 0%, var(--star-primary) 50%, #A67B3D 100%);
+  box-shadow: 0 0 0 3px rgba(184,146,74,0.2), 0 0 12px rgba(184,146,74,0.3), 0 4px 18px rgba(184,146,74,0.45), inset 0 1px 1px rgba(255,255,255,0.2);
+  transform: scale(1.15);
+}
+.day-btn.today-btn {
+  font-weight: 700; color: var(--star-primary);
+  background: rgba(184,146,74,0.1);
+  box-shadow: inset 0 0 0 2px rgba(184,146,74,0.25);
+  animation: todayPulse 3s ease-in-out infinite;
+}
+@keyframes todayPulse {
+  0%, 100% { box-shadow: inset 0 0 0 2px rgba(184,146,74,0.25); }
+  50% { box-shadow: inset 0 0 0 2px rgba(184,146,74,0.4), 0 0 12px rgba(184,146,74,0.12); }
+}
+.day-btn.today-btn.active {
+  color: white; background: linear-gradient(135deg, #C9A04E 0%, var(--star-primary) 50%, #A67B3D 100%);
+  box-shadow: 0 4px 18px rgba(184,146,74,0.45); animation: none;
+}
+.day-btn.active::before {
+  content: '✦'; position: absolute; top: -6px; right: -6px;
+  font-size: 0.55rem; color: rgba(184,146,74,0.8);
+  text-shadow: 0 0 6px rgba(184,146,74,0.5), 0 0 12px rgba(184,146,74,0.25);
+  animation: daySparkle 2.5s ease-in-out infinite;
+  z-index: 3;
+}
+@keyframes daySparkle {
+  0%, 100% { opacity: 0.5; transform: scale(0.8) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(15deg); }
+}
+.day-btn.has-event::after {
+  content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+  width: 5px; height: 5px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--star-primary), #D4A853);
+  box-shadow: 0 0 4px rgba(184,146,74,0.3);
+}
+.day-btn.active.has-event::after { background: rgba(255,255,255,0.85); box-shadow: 0 0 6px rgba(255,255,255,0.4); }
+.day-btn.weekend { color: var(--personal-primary); }
+.day-btn.weekend.active { color: white; }
+.day-btn.past-day { opacity: 0.4; }
+.day-btn.past-day:hover { opacity: 0.7; }
+.day-btn.past-day.active { opacity: 1; }
 
 .day-content { animation: fadeIn 0.4s ease; }
 .day-header {
@@ -305,8 +420,11 @@ body {
   padding: 24px; box-shadow: var(--shadow); margin-bottom: 16px;
   animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
   transition: box-shadow 0.4s ease;
+  position: relative; overflow: hidden;
+  border: 1px solid rgba(184,146,74,0.18);
 }
-.day-card:hover { box-shadow: var(--shadow-hover); }
+.day-card > * { position: relative; z-index: 1; }
+.day-card:hover { box-shadow: var(--shadow-hover); border-color: rgba(164,126,54,0.4); }
 .day-content .day-card:nth-child(2) { animation-delay: 0.08s; }
 .day-content .day-card:nth-child(3) { animation-delay: 0.16s; }
 .day-card-title {
@@ -401,41 +519,62 @@ body {
   margin: 0; cursor: pointer; transition: all 0.3s ease; border-radius: 8px;
 }
 .task-check:hover { background: rgba(184,146,74,0.04); transform: translateX(2px); }
-.task-check.done { opacity: 0.4; }
-.task-check.done .task-check-label { text-decoration: line-through; }
+.task-check.done .task-check-label { text-decoration: line-through; color: var(--text-light); }
 .task-check input[type="checkbox"] {
   width: 20px; height: 20px; flex-shrink: 0; cursor: pointer;
   accent-color: var(--star-primary);
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+.task-check input[type="checkbox"]:checked {
+  transform: scale(1.2);
+  animation: checkBounce 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes checkBounce {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1.2); }
+}
+.task-check.done {
+  opacity: 0.4;
+  animation: taskFadeOut 0.4s ease;
+}
+@keyframes taskFadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0.4; }
 }
 .task-check input.zy-accent { accent-color: var(--zy-primary); }
 .task-check input.personal-accent { accent-color: var(--personal-primary); }
 .task-check input.life-accent { accent-color: var(--life-primary); }
 .task-check-label { font-size: 0.88rem; line-height: 1.5; flex: 1; font-weight: 500; }
 .task-check-wrap {
-  margin-bottom: 0; border-bottom: 1px solid rgba(184,146,74,0.08);
-  padding-bottom: 0;
+  margin-bottom: 0; padding-bottom: 0;
+  border-bottom: 1px solid rgba(184,146,74,0.06);
 }
 .task-check-wrap:last-child { border-bottom: none; }
 .task-meta {
-  display: flex; gap: 8px; padding: 0 12px 10px 44px; align-items: center;
+  display: flex; gap: 10px; padding: 2px 12px 12px 44px; align-items: center;
+  background: rgba(184,146,74,0.02); border-radius: 0 0 8px 8px;
+  margin: 0 4px;
 }
 .task-time-input {
-  width: 52px; padding: 4px 6px; border: 1px solid var(--border);
-  border-radius: 6px; font-family: 'Noto Sans TC', sans-serif; font-size: 0.8rem;
-  color: var(--text-dark); background: var(--bg); text-align: center; outline: none;
-  -moz-appearance: textfield;
+  width: 48px; padding: 5px 6px; border: 1.5px solid rgba(184,146,74,0.15);
+  border-radius: 8px; font-family: 'Noto Sans TC', sans-serif; font-size: 0.78rem;
+  color: var(--text-dark); background: white; text-align: center; outline: none;
+  -moz-appearance: textfield; transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(58,42,20,0.04);
 }
 .task-time-input::-webkit-outer-spin-button,
 .task-time-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.task-time-input:focus { border-color: var(--star-primary); }
-.task-time-label { font-size: 0.75rem; color: var(--text-light); }
+.task-time-input:focus { border-color: var(--star-primary); box-shadow: 0 0 0 3px rgba(184,146,74,0.1); }
+.task-time-label { font-size: 0.72rem; color: var(--text-light); letter-spacing: 0.02em; }
 .task-note {
-  flex: 1; padding: 3px 8px; border: 1px solid transparent;
-  border-radius: 6px; font-family: 'Noto Sans TC', sans-serif; font-size: 0.78rem;
-  color: var(--text-mid); background: transparent; resize: none; outline: none;
-  min-width: 0;
+  flex: 1; padding: 5px 10px; border: 1.5px solid rgba(184,146,74,0.1);
+  border-radius: 8px; font-family: 'Noto Sans TC', sans-serif; font-size: 0.78rem;
+  color: var(--text-mid); background: white; resize: none; outline: none;
+  min-width: 0; transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(58,42,20,0.04);
 }
-.task-note:focus { border-color: var(--border); background: white; }
+.task-note:focus { border-color: var(--star-primary); background: white; box-shadow: 0 0 0 3px rgba(184,146,74,0.1); }
 .task-note::placeholder { color: var(--text-light); }
 .carried-tag {
   font-size: 0.68rem; padding: 2px 8px; border-radius: 8px;
@@ -502,7 +641,8 @@ body {
   .section-title { font-size: 1.25rem; }
   .main { padding: 20px 16px; }
   .calendar-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .day-btn { padding: 6px 10px; font-size: 0.78rem; }
+  .day-btn { font-size: 0.78rem; }
+  .day-grid-wrap { padding: 12px; }
   .day-date { font-size: 1.4rem; }
   .goal-new-row { flex-wrap: wrap; }
   .goal-new-input { flex: 1 1 100%; }
@@ -518,21 +658,41 @@ body {
 
 /* MONTH NAV */
 .month-nav {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 20px;
+  position: relative;
 }
-.month-nav-btn {
-  padding: 6px 18px; border: 1.5px solid var(--border); background: var(--card-bg);
-  border-radius: 20px; font-family: 'Noto Sans TC', sans-serif; font-size: 0.82rem;
-  cursor: pointer; transition: all 0.3s ease; color: var(--text-light); font-weight: 500;
+.month-carousel {
+  display: flex; align-items: center; justify-content: center;
+  min-width: 140px;
 }
-.month-nav-btn:hover { border-color: var(--star-primary); color: var(--star-primary); }
-.month-nav-btn.active { border-color: var(--star-primary); color: white; background: var(--star-primary); font-weight: 600; }
+.month-label {
+  font-family: 'Noto Serif TC', serif; font-size: 0.95rem; font-weight: 600;
+  color: var(--text-dark); letter-spacing: 0.1em;
+  padding: 6px 22px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(253,250,245,0.95) 50%, rgba(255,253,248,0.98) 100%);
+  border: 1.5px solid transparent;
+  border-radius: 24px;
+  background-clip: padding-box;
+  box-shadow: 0 2px 12px rgba(58,42,20,0.06), inset 0 1px 3px rgba(184,146,74,0.1), inset 0 -1px 2px rgba(58,42,20,0.04);
+  position: relative;
+}
+.month-label::before {
+  content: ''; position: absolute; inset: -1.5px; border-radius: 25px; z-index: -1;
+  background: linear-gradient(135deg, rgba(184,146,74,0.5) 0%, rgba(212,168,83,0.3) 50%, rgba(184,146,74,0.5) 100%);
+}
+.month-label span {
+  color: var(--text-dark);
+  text-shadow: 0 0 18px rgba(184,146,74,0.3), 0 0 36px rgba(184,146,74,0.12);
+}
+.month-nav-btn { display: none; }
 .month-arrow {
-  width: 32px; height: 32px; border: 1px solid var(--border); background: var(--card-bg);
+  width: 36px; height: 36px; border: 1.5px solid rgba(154,120,50,0.25); background: rgba(255,255,255,0.9);
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all 0.3s ease; color: var(--text-light); font-size: 0.9rem;
+  cursor: pointer; transition: all 0.3s ease; color: var(--text-light); font-size: 0.85rem;
+  margin: 0 8px; box-shadow: 0 2px 8px rgba(58,42,20,0.05);
 }
-.month-arrow:hover { border-color: var(--star-primary); color: var(--star-primary); }
+.month-arrow:hover { border-color: var(--star-primary); color: var(--star-primary); background: white; box-shadow: 0 3px 12px rgba(184,146,74,0.15); }
+.month-arrow:active { border-color: rgba(184,146,74,0.6); color: var(--star-primary); background: white; box-shadow: 0 0 16px rgba(184,146,74,0.35), 0 0 32px rgba(184,146,74,0.15); transform: scale(0.95); }
 
 /* GOAL TABS */
 .goal-tabs {
@@ -655,11 +815,17 @@ body {
 .brand-complete {
   background: linear-gradient(135deg, rgba(46,125,50,0.06) 0%, rgba(46,125,50,0.02) 100%);
   border-radius: 8px; padding: 10px 16px; margin: 8px 12px;
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 10px;
   animation: celebratePop 0.5s cubic-bezier(0.22,1,0.36,1) both;
   border: 1px solid rgba(46,125,50,0.15);
 }
-.brand-complete-text { font-size: 0.82rem; font-weight: 600; color: #2E7D32; }
+.brand-complete .complete-icon {
+  width: 20px; height: 20px; border-radius: 4px;
+  background: #3A5A3C; color: white;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; flex-shrink: 0;
+}
+.brand-complete-text { font-size: 0.82rem; font-weight: 600; color: #3A5A3C; }
 .goal-small-btn.eye { background: transparent; color: var(--text-light); font-size: 0.82rem; padding: 4px 8px; }
 .goal-small-btn.eye:hover { color: var(--text-mid); }
 .goal-card.goal-hidden { opacity: 0.45; }
@@ -706,7 +872,7 @@ body {
 
 <nav class="nav">
   <div class="nav-inner">
-    <div class="nav-brand" id="navBrand">青青總控台</div>
+    <div class="nav-brand" id="navBrand">青青專屬助理</div>
     <div class="nav-right">
       <button class="mode-toggle team-mode" id="modeBtn" onclick="toggleMode()">團隊檢視</button>
       <button class="mobile-nav-toggle" onclick="toggleMobileNav()" aria-label="選單">
@@ -731,7 +897,7 @@ body {
   <!-- OVERVIEW -->
   <div class="section" id="sec-overview">
     <div class="section-header">
-      <div class="section-title">青青總控台</div>
+      <div class="section-title">青青專屬助理</div>
       <div class="section-subtitle" id="overviewSubtitle">2026 年 4 月 ・ 載入中...</div>
     </div>
     <div class="brand-cards" id="brandCards"></div>
@@ -896,9 +1062,9 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKmthPDQr60-Db
 let viewMode = (function() {
   try {
     const p = new URLSearchParams(window.location.search).get('mode');
-    if (p === 'private' || p === 'zy' || p === 'team') return p;
+    if (p === 'zy' || p === 'team') return p;
   } catch(e) {}
-  return localStorage.getItem('dashboardMode') || 'private';
+  return 'private';
 })();
 let isPrivateMode = viewMode === 'private';
 let sheetData = [];
@@ -1752,7 +1918,7 @@ function updateVisibility() {
   if (viewMode === 'private') {
     btn.className = 'mode-toggle private-mode';
     btn.textContent = '青青檢視';
-    if (brand) brand.textContent = '青青總控台';
+    if (brand) brand.textContent = '青青專屬助理';
   } else if (viewMode === 'zy') {
     btn.className = 'mode-toggle zy-mode';
     btn.textContent = '智堯檢視';
@@ -1760,7 +1926,7 @@ function updateVisibility() {
   } else {
     btn.className = 'mode-toggle team-mode';
     btn.textContent = '團隊檢視';
-    if (brand) brand.textContent = '初星群總控台';
+    if (brand) brand.textContent = '青青專屬助理';
   }
   isPrivateMode = viewMode === 'private';
   document.querySelectorAll('.personal-only').forEach(el => {
@@ -1857,10 +2023,11 @@ function renderOverview() {
 function renderCalMonthNav() {
   const nav = document.getElementById('calMonthNav');
   if (!nav) return;
-  let html = '';
-  [4,5,6].forEach(m => {
-    html += `<button class="month-nav-btn${selectedCalMonth === m ? ' active' : ''}" onclick="selectedCalMonth=${m};renderCalMonthNav();renderCalendar();">${m} 月</button>`;
-  });
+  const months = [4,5,6];
+  const curIdx = months.indexOf(selectedCalMonth);
+  let html = `<button class="month-arrow" style="opacity:${curIdx>0?'1':'0.3'};cursor:${curIdx>0?'pointer':'default'}" onclick="if(${curIdx}>0){selectedCalMonth=${months[Math.max(curIdx-1,0)]};renderCalMonthNav();renderCalendar();}">‹</button>`;
+  html += `<div class="month-label"><span>2026 年 ${selectedCalMonth} 月</span></div>`;
+  html += `<button class="month-arrow" style="opacity:${curIdx<months.length-1?'1':'0.3'};cursor:${curIdx<months.length-1?'pointer':'default'}" onclick="if(${curIdx}<${months.length-1}){selectedCalMonth=${months[Math.min(curIdx+1,months.length-1)]};renderCalMonthNav();renderCalendar();}">›</button>`;
   nav.innerHTML = html;
 }
 
@@ -1968,38 +2135,85 @@ function renderDaySelector() {
   const container = document.getElementById('daySelector');
   container.innerHTML = '';
 
-  // Month nav for daily view
+  // Month nav - single month carousel
+  const months = [4,5,6];
+  const curIdx = months.indexOf(selectedDayMonth);
   const monthNav = document.createElement('div');
   monthNav.className = 'month-nav';
-  monthNav.style.justifyContent = 'center';
-  [4,5,6].forEach(m => {
-    const btn = document.createElement('button');
-    btn.className = 'month-nav-btn' + (selectedDayMonth === m ? ' active' : '');
-    btn.textContent = m + ' 月';
-    btn.onclick = () => { selectedDayMonth = m; renderDaySelector(); showDay(m === CURRENT_MONTH ? TODAY : 1, m); };
-    monthNav.appendChild(btn);
-  });
+
+  const leftArr = document.createElement('button');
+  leftArr.className = 'month-arrow';
+  leftArr.textContent = '‹';
+  leftArr.style.opacity = curIdx > 0 ? '1' : '0.3';
+  leftArr.style.cursor = curIdx > 0 ? 'pointer' : 'default';
+  leftArr.onclick = () => { if (curIdx > 0) { selectedDayMonth = months[curIdx - 1]; renderDaySelector(); showDay(months[curIdx-1] === CURRENT_MONTH ? TODAY : 1, months[curIdx-1]); }};
+  monthNav.appendChild(leftArr);
+
+  const label = document.createElement('div');
+  label.className = 'month-label';
+  label.innerHTML = `<span>2026 年 ${selectedDayMonth} 月</span>`;
+  monthNav.appendChild(label);
+
+  const rightArr = document.createElement('button');
+  rightArr.className = 'month-arrow';
+  rightArr.textContent = '›';
+  rightArr.style.opacity = curIdx < months.length - 1 ? '1' : '0.3';
+  rightArr.style.cursor = curIdx < months.length - 1 ? 'pointer' : 'default';
+  rightArr.onclick = () => { if (curIdx < months.length - 1) { selectedDayMonth = months[curIdx + 1]; renderDaySelector(); showDay(months[curIdx+1] === CURRENT_MONTH ? TODAY : 1, months[curIdx+1]); }};
+  monthNav.appendChild(rightArr);
+
   container.appendChild(monthNav);
 
   const mc = MONTHS_CONFIG[selectedDayMonth];
   if (!mc) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'day-grid-wrap';
+
+
+  // Weekday headers
+  const headerDiv = document.createElement('div');
+  headerDiv.className = 'day-grid-header';
+  ['一','二','三','四','五','六','日'].forEach(wd => {
+    const sp = document.createElement('span');
+    sp.textContent = wd;
+    if (wd === '六' || wd === '日') sp.style.color = 'var(--personal-primary)';
+    headerDiv.appendChild(sp);
+  });
+  wrap.appendChild(headerDiv);
+
+  // Calendar grid
   const grid = document.createElement('div');
-  grid.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;justify-content:center;';
+  grid.className = 'day-grid';
+
+  // Calculate first day offset (2026-04-01 is Wednesday=2, May=4, June=0)
+  const firstDay = new Date(2026, selectedDayMonth - 1, 1).getDay();
+  const offset = firstDay === 0 ? 6 : firstDay - 1; // Monday-based
+  for (let i = 0; i < offset; i++) {
+    const empty = document.createElement('div');
+    grid.appendChild(empty);
+  }
+
   for (let d = 1; d <= mc.days; d++) {
     const btn = document.createElement('button');
     btn.className = 'day-btn';
     btn.textContent = d;
     btn.id = 'dayBtn' + d;
     if (CURRENT_MONTH === selectedDayMonth && d === TODAY) btn.classList.add('today-btn');
+    if (CURRENT_MONTH === selectedDayMonth && d < TODAY) btn.classList.add('past-day');
+    if (CURRENT_MONTH > selectedDayMonth) btn.classList.add('past-day');
+    const wd = new Date(2026, selectedDayMonth - 1, d).getDay();
+    if (wd === 0 || wd === 6) btn.classList.add('weekend');
     const events = getEventsForDay(selectedDayMonth, d);
     if (events.length > 0) btn.classList.add('has-event');
     const goalSteps = getGoalStepsForDay(d, selectedDayMonth);
-    if (goalSteps.length > 0) btn.style.borderColor = 'var(--star-primary)';
+    if (goalSteps.length > 0 && events.length === 0) btn.style.borderColor = 'rgba(184,146,74,0.3)';
     const day = d;
     btn.onclick = () => showDay(day, selectedDayMonth);
     grid.appendChild(btn);
   }
-  container.appendChild(grid);
+  wrap.appendChild(grid);
+  container.appendChild(wrap);
 }
 
 function taskCheckHTML(key, label, brandClass, showNote) {
@@ -2008,7 +2222,7 @@ function taskCheckHTML(key, label, brandClass, showNote) {
   const taskTime = getTime(0, key) || ''; // task-level time stored as time_taskkey
   let html = `<div class="task-check-wrap">
     <label class="task-check${checked ? ' done' : ''}">
-      <input type="checkbox" class="${accentClass}" data-key="${key}" ${checked ? 'checked' : ''} onchange="handleCheck(this)">
+      <input type="checkbox" class="${accentClass}" data-key="${key}" data-label="${label.replace(/"/g,'&quot;')}" data-brand="${brandClass === 'zy-check' ? '智堯' : brandClass === 'personal-check' ? '青青' : brandClass === 'life-check' ? '生活' : '初星群'}" ${checked ? 'checked' : ''} onchange="handleCheck(this)">
       <div class="task-check-label">${label}</div>
     </label>`;
   if (showNote) {
@@ -2027,6 +2241,11 @@ function taskCheckHTML(key, label, brandClass, showNote) {
 function handleCheck(el) {
   const key = el.dataset.key;
   const val = el.checked;
+  const label = el.dataset.label || key;
+  const brand = el.dataset.brand || '';
+  // Parse date from key: "day_type_idx" or "month_day_type"
+  const keyParts = key.split('_');
+  const dayNum = keyParts[0];
   taskChecks[key] = val;
   localStorage.setItem('taskChecks', JSON.stringify(taskChecks));
   el.closest('.task-check').classList.toggle('done', val);
@@ -2035,7 +2254,7 @@ function handleCheck(el) {
     fetch(APPS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({action: 'toggle', key: key, value: val})
+      body: JSON.stringify({action: 'toggle', key, value: val, label, brand, day: dayNum})
     }).catch(() => {});
   }
   // Update header counter
@@ -2102,7 +2321,8 @@ function showDay(day, month) {
   // Progress bar
   const pct = totalCount > 0 ? Math.round(doneCount/totalCount*100) : 0;
   html += '<div style="display:flex;align-items:center;gap:10px;margin:12px 0 16px;">';
-  html += `<div class="progress-bar" style="flex:1;height:6px;"><div class="progress-fill" style="width:${pct}%;background:${pct===100?'#2E7D32':'var(--star-primary)'};"></div></div>`;
+  const barBg = pct === 100 ? 'linear-gradient(90deg, #43A047, #2E7D32)' : 'linear-gradient(90deg, #D4A853, var(--star-primary), #A67B3D)';
+  html += `<div class="progress-bar" style="flex:1;height:7px;border-radius:4px;background:rgba(58,42,20,0.06);"><div class="progress-fill" style="width:${pct}%;background:${barBg};border-radius:4px;"></div></div>`;
   html += `<div id="dayDoneCounter" style="font-size:0.82rem;font-weight:600;color:${pct===100 ? '#2E7D32' : 'var(--text-mid)'};">${doneCount}/${totalCount}</div>`;
   html += '</div>';
 
@@ -2111,7 +2331,7 @@ function showDay(day, month) {
     html += '<div style="font-size:0.78rem;color:var(--text-light);margin-bottom:4px;">待完成：</div>';
     html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
     undoneItems.forEach(item => {
-      html += `<span style="font-size:0.75rem;padding:3px 10px;border-radius:10px;background:rgba(184,146,74,0.06);color:${item.color};font-weight:500;">${item.label}</span>`;
+      html += `<span style="font-size:0.73rem;padding:4px 12px;border-radius:12px;background:white;color:${item.color};font-weight:500;border:1.5px solid ${item.color}22;box-shadow:0 1px 4px rgba(58,42,20,0.05);letter-spacing:0.02em;transition:all 0.3s;">${item.label}</span>`;
     });
     html += '</div>';
   } else if (doneCount === totalCount && totalCount > 0) {
@@ -2146,15 +2366,15 @@ function showDay(day, month) {
   });
   const brandNames = {star: '初星群', zy: '智堯', personal: '青青', life: '生活'};
   const brandColorMap = {star: 'var(--star-primary)', zy: 'var(--zy-primary)', personal: 'var(--personal-primary)', life: 'var(--life-primary)'};
-  html += `<div style="background:linear-gradient(135deg, rgba(184,146,74,0.06) 0%, rgba(184,146,74,0.02) 100%);border:1.5px dashed rgba(184,146,74,0.3);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;">`;
-  html += `<div style="font-size:0.88rem;font-weight:600;color:var(--star-primary);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-    <span style="font-size:1rem;">+</span> 新增今日任務</div>`;
+  html += `<div class="add-task-area" style="background:linear-gradient(135deg, rgba(184,146,74,0.04) 0%, rgba(255,255,255,0.6) 100%);border:1.5px dashed rgba(184,146,74,0.25);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;transition:all 0.3s ease;cursor:default;" onmouseenter="this.style.borderColor='rgba(184,146,74,0.5)';this.style.background='linear-gradient(135deg, rgba(184,146,74,0.08) 0%, rgba(255,255,255,0.8) 100)';this.style.boxShadow='0 2px 12px rgba(184,146,74,0.08)'" onmouseleave="this.style.borderColor='rgba(184,146,74,0.25)';this.style.background='linear-gradient(135deg, rgba(184,146,74,0.04) 0%, rgba(255,255,255,0.6) 100%)';this.style.boxShadow='none'">`;
+  html += `<div style="font-size:0.85rem;font-weight:600;color:var(--star-primary);margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+    <span style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--star-primary),#D4A853);color:white;display:inline-flex;align-items:center;justify-content:center;font-size:0.85rem;box-shadow:0 2px 6px rgba(184,146,74,0.3);">+</span> 新增今日任務</div>`;
   html += `<div class="life-input-row" style="margin-bottom:0;">
     <select id="customTaskBrand_${ctKey}" style="padding:8px 10px;border:1.5px solid rgba(184,146,74,0.25);border-radius:8px;font-family:inherit;font-size:0.82rem;color:var(--text-dark);background:white;outline:none;">
-      ${viewMode !== 'private' ? '<option value="zy">智堯</option>' : ''}
-      ${viewMode !== 'zy' ? '<option value="personal">青青</option>' : ''}
+      <option value="zy">智堯</option>
+      <option value="personal">青青</option>
       <option value="star">初星群</option>
-      ${viewMode !== 'zy' ? '<option value="life">生活</option>' : ''}
+      <option value="life">生活</option>
     </select>
     <input type="text" class="life-input" id="customTaskInput_${ctKey}" placeholder="輸入任務內容..." onkeydown="if(event.key==='Enter')addCustomTask(${day},${month})" style="flex:1;border-color:rgba(184,146,74,0.25);">
     <button class="life-add-btn" onclick="addCustomTask(${day},${month})">+</button>
@@ -2174,7 +2394,7 @@ function showDay(day, month) {
           <input type="checkbox" ${ct.done ? 'checked' : ''} onchange="toggleCustomTask(${day},${month},${realIdx});this.closest('.task-check').classList.toggle('done',this.checked)">
           <div class="task-check-label">${escapeHtml(ct.text)}<span style="color:var(--text-light);font-size:0.7rem;margin-left:6px;">自訂</span></div>
         </label>
-        <button onclick="removeCustomTask(${day},${month},${realIdx})" style="background:none;border:none;color:var(--text-light);cursor:pointer;font-size:0.75rem;padding:4px 8px;opacity:0.5;">&times;</button>
+        <button onclick="if(confirm('確定刪除這個任務？'))removeCustomTask(${day},${month},${realIdx})" style="background:none;border:none;color:#D32F2F;cursor:pointer;font-size:0.85rem;padding:6px 10px;opacity:0.6;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" title="刪除任務">&times;</button>
       </div>`;
     });
     return h;
@@ -2188,7 +2408,7 @@ function showDay(day, month) {
 
   let secCarried = '';
   if (carried.length > 0) {
-    secCarried += '<div class="task-overdue" style="padding:20px 20px 8px;border-bottom:1px solid rgba(211,47,47,0.1);">';
+    secCarried += '<div class="task-overdue" style="padding:20px 20px 8px;border-bottom:1px solid rgba(211,47,47,0.1);border-left:3px solid #D32F2F;">';
     secCarried += '<div class="day-card-title" style="color:#D32F2F;">昨日延後<span class="overdue-badge">urgent</span></div>';
     carried.forEach((task, i) => { secCarried += taskCheckHTML(`${day}_carry_${i}`, task, '', true); });
     secCarried += '</div>';
@@ -2197,7 +2417,7 @@ function showDay(day, month) {
   let secStar = '';
   const starCustom = renderCustomTasksForBrand('star');
   if (events.length > 0 || starCustom) {
-    secStar += sec();
+    secStar += '<div style="padding:20px 20px 8px;border-bottom:1px solid rgba(184,146,74,0.06);border-left:3px solid var(--star-primary);">';
     secStar += '<div class="day-card-title" style="color:var(--star-primary);">初星群</div>';
     events.filter(e => e.type !== 'ongoing').forEach((e,i) => { secStar += taskCheckHTML(`${day}_event_${i}`, e.name, '', true); });
     events.filter(e => e.type === 'ongoing').forEach(e => {
@@ -2212,7 +2432,7 @@ function showDay(day, month) {
     const zyTaskKeys = [`${day}_zy_threads`, ...ig.filter(t=>t.brand==='zy').map((_,i)=>`${day}_ig_${i}`)];
     const zyAllDone = zyTaskKeys.length > 0 && zyTaskKeys.every(k => isChecked(k));
     const zyDoneCount = zyTaskKeys.filter(k => isChecked(k)).length;
-    secZy += sec();
+    secZy += '<div style="padding:20px 20px 8px;border-bottom:1px solid rgba(184,146,74,0.06);border-left:3px solid var(--zy-primary);">';
     secZy += '<div class="day-card-title" style="color:var(--zy-primary);">智堯';
     if (dayData) secZy += ` <span class="status-badge ${statusClass(dayData.zyStatus)}">${dayData.zyStatus}</span>`;
     secZy += '</div>';
@@ -2237,7 +2457,7 @@ function showDay(day, month) {
     const pTaskKeys = [`${day}_personal_threads`, ...ig.filter(t=>t.brand==='personal').map((_,i)=>{const idx=ig.indexOf(ig.filter(t2=>t2.brand==='personal')[i]);return `${day}_ig_${idx}`;})];
     const pAllDone = pTaskKeys.length > 0 && pTaskKeys.every(k => isChecked(k));
     const pDoneCount = pTaskKeys.filter(k => isChecked(k)).length;
-    secPersonal += sec();
+    secPersonal += '<div style="padding:20px 20px 8px;border-bottom:1px solid rgba(184,146,74,0.06);border-left:3px solid var(--personal-primary);">';
     secPersonal += '<div class="day-card-title" style="color:var(--personal-primary);">青青品牌';
     if (dayData) secPersonal += ` <span class="status-badge ${statusClass(dayData.personalStatus)}">${dayData.personalStatus}</span>`;
     secPersonal += '</div>';
@@ -2274,13 +2494,13 @@ function showDay(day, month) {
   if (viewMode !== 'private') {
     const zyKeys = [`${day}_zy_threads`, ...ig.filter(t=>t.brand==='zy').map((_,i)=>`${day}_ig_${i}`)];
     if (zyKeys.length > 0 && zyKeys.every(k => isChecked(k))) {
-      html += `<div class="brand-complete"><span style="font-size:1.2rem;">&#10003;</span><div class="brand-complete-text" style="color:var(--zy-primary);">智堯任務全部完成！${randEnc()}</div></div>`;
+      html += `<div class="brand-complete"><span class="complete-icon">✓</span><div class="brand-complete-text" style="color:var(--zy-primary);">智堯任務全部完成！${randEnc()}</div></div>`;
     }
   }
   if (viewMode !== 'zy') {
     const pKeys = [`${day}_personal_threads`, ...ig.filter(t=>t.brand==='personal').map((_,i)=>{const idx=ig.indexOf(_);return `${day}_ig_${idx}`;})];
     if (pKeys.length > 0 && pKeys.every(k => isChecked(k))) {
-      html += `<div class="brand-complete"><span style="font-size:1.2rem;">&#10003;</span><div class="brand-complete-text" style="color:var(--personal-primary);">青青任務全部完成！${randEnc()}</div></div>`;
+      html += `<div class="brand-complete"><span class="complete-icon">✓</span><div class="brand-complete-text" style="color:var(--personal-primary);">青青任務全部完成！${randEnc()}</div></div>`;
     }
   }
 
@@ -2291,7 +2511,7 @@ function showDay(day, month) {
     html += '<div style="padding:20px 20px 8px;border-bottom:1px solid rgba(184,146,74,0.08);">';
     html += '<div class="day-card-title" style="color:var(--text-mid);">準備事項</div>';
     if (prepAllDone) {
-      html += `<div class="brand-complete" style="margin:0 0 8px;"><span style="font-size:1.2rem;">&#10003;</span><div class="brand-complete-text">準備事項全部完成！</div></div>`;
+      html += `<div class="brand-complete" style="margin:0 0 8px;"><span class="complete-icon">✓</span><div class="brand-complete-text">準備事項全部完成！</div></div>`;
     } else {
       prep.forEach((p,i) => {
         const done = isChecked(`${day}_prep_${i}`);
@@ -2595,13 +2815,75 @@ function switchSop(brand, btn) {
   btn.classList.add('active-' + brand);
 }
 
+// === 金色粒子慶祝 ===
+function burstParticles(x, y) {
+  const colors = ['#B8924A', '#D4A853', '#E8C87A', '#E88B7A', '#F5D6CA'];
+  const container = document.createElement('div');
+  container.className = 'particle-burst';
+  container.style.left = x + 'px';
+  container.style.top = y + 'px';
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const angle = (Math.PI * 2 / 12) * i + (Math.random() - 0.5) * 0.5;
+    const dist = 40 + Math.random() * 50;
+    const tx = Math.cos(angle) * dist;
+    const ty = Math.sin(angle) * dist;
+    const size = 3 + Math.random() * 4;
+    p.style.cssText = `width:${size}px;height:${size}px;background:${colors[i % colors.length]};--tx:${tx}px;--ty:${ty}px;animation-delay:${Math.random()*0.15}s;`;
+    container.appendChild(p);
+  }
+  document.body.appendChild(container);
+  setTimeout(() => container.remove(), 1200);
+}
+
+// Hook into checkbox changes for particle effect
+document.addEventListener('change', (e) => {
+  if (e.target.type === 'checkbox' && e.target.checked) {
+    const rect = e.target.getBoundingClientRect();
+    burstParticles(rect.left + rect.width / 2, rect.top + rect.height / 2 + window.scrollY);
+  }
+});
+
+// === 滾動淡入 ===
+const scrollObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+function initScrollReveal() {
+  document.querySelectorAll('.day-card, .section-header, .day-grid-wrap').forEach(el => {
+    el.classList.add('scroll-reveal');
+    scrollObserver.observe(el);
+  });
+}
+// Re-init scroll reveal when day changes
+const origShowDay = showDay;
+showDay = function(...args) {
+  origShowDay.apply(this, args);
+  setTimeout(initScrollReveal, 50);
+};
+
 // === INIT ===
 (async () => {
   await loadTaskChecks();
   await fetchSheetData();
   renderSummary();
+  initScrollReveal();
 })();
 setInterval(fetchSheetData, 5 * 60 * 1000);
 </script>
+
+<footer style="text-align:center;padding:32px 24px 28px;margin-top:16px;border-top:1px solid rgba(184,146,74,0.12);">
+  <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">
+    <span style="font-size:0.7rem;color:rgba(184,146,74,0.5);">✦</span>
+    <span style="font-family:'Noto Serif TC',serif;font-size:0.82rem;font-weight:500;color:var(--text-light);letter-spacing:0.08em;">青青專屬助理</span>
+    <span style="font-size:0.7rem;color:rgba(184,146,74,0.5);">✦</span>
+  </div>
+  <div style="font-size:0.72rem;color:var(--text-light);opacity:0.6;">每一天都是品牌成長的累積</div>
+</footer>
 </body>
 </html>
