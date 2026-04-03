@@ -420,10 +420,13 @@ body {
   display: flex; gap: 8px; padding: 0 12px 10px 44px; align-items: center;
 }
 .task-time-input {
-  width: 44px; padding: 3px 6px; border: 1px solid var(--border);
-  border-radius: 6px; font-family: 'Noto Sans TC', sans-serif; font-size: 0.78rem;
+  width: 52px; padding: 4px 6px; border: 1px solid var(--border);
+  border-radius: 6px; font-family: 'Noto Sans TC', sans-serif; font-size: 0.8rem;
   color: var(--text-dark); background: var(--bg); text-align: center; outline: none;
+  -moz-appearance: textfield;
 }
+.task-time-input::-webkit-outer-spin-button,
+.task-time-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .task-time-input:focus { border-color: var(--star-primary); }
 .task-time-label { font-size: 0.75rem; color: var(--text-light); }
 .task-note {
@@ -609,6 +612,54 @@ body {
 .goal-small-btn.add { background: var(--star-primary); color: white; }
 .goal-small-btn.add:hover { opacity: 0.85; }
 .goal-small-btn.del { background: transparent; color: var(--text-light); font-size: 0.75rem; }
+/* Timeline */
+.day-timeline {
+  background: linear-gradient(135deg, rgba(184,146,74,0.08) 0%, rgba(184,146,74,0.03) 100%);
+  border-radius: var(--radius); padding: 16px 20px; margin-bottom: 16px;
+  border-left: 3px solid var(--star-primary);
+}
+.day-timeline-title {
+  font-size: 0.82rem; font-weight: 600; color: var(--star-primary);
+  margin-bottom: 10px; letter-spacing: 0.04em;
+}
+.timeline-item {
+  display: flex; align-items: flex-start; gap: 12px; padding: 8px 0;
+  border-bottom: 1px solid rgba(184,146,74,0.08);
+}
+.timeline-item:last-child { border-bottom: none; }
+.timeline-time {
+  font-family: 'Noto Serif TC', serif; font-size: 0.88rem; font-weight: 600;
+  color: var(--star-primary); min-width: 65px; text-align: right;
+}
+.timeline-dot {
+  width: 10px; height: 10px; border-radius: 50%; background: var(--star-primary);
+  margin-top: 6px; flex-shrink: 0; box-shadow: 0 0 0 3px rgba(184,146,74,0.15);
+}
+.timeline-label { font-size: 0.85rem; color: var(--text-dark); line-height: 1.5; }
+/* Overdue */
+.task-overdue { border-left: 3px solid #D32F2F !important; background: rgba(211,47,47,0.04) !important; }
+.overdue-badge {
+  display: inline-block; font-size: 0.68rem; padding: 1px 8px; border-radius: 8px;
+  background: rgba(211,47,47,0.1); color: #D32F2F; font-weight: 600; margin-left: 6px;
+}
+/* Collapse done */
+.done-collapse-toggle {
+  display: flex; align-items: center; gap: 6px; padding: 8px 12px;
+  font-size: 0.78rem; color: var(--text-light); cursor: pointer;
+  background: rgba(184,146,74,0.04); border-radius: 8px; margin: 8px 12px;
+  border: none; font-family: inherit; width: calc(100% - 24px);
+}
+.done-collapse-toggle:hover { background: rgba(184,146,74,0.08); }
+/* Celebration */
+@keyframes celebratePop { 0% { transform: scale(0.8); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+.brand-complete {
+  background: linear-gradient(135deg, rgba(46,125,50,0.06) 0%, rgba(46,125,50,0.02) 100%);
+  border-radius: 8px; padding: 10px 16px; margin: 8px 12px;
+  display: flex; align-items: center; gap: 8px;
+  animation: celebratePop 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  border: 1px solid rgba(46,125,50,0.15);
+}
+.brand-complete-text { font-size: 0.82rem; font-weight: 600; color: #2E7D32; }
 .goal-small-btn.eye { background: transparent; color: var(--text-light); font-size: 0.82rem; padding: 4px 8px; }
 .goal-small-btn.eye:hover { color: var(--text-mid); }
 .goal-card.goal-hidden { opacity: 0.45; }
@@ -689,7 +740,7 @@ body {
       <div id="progressBars"></div>
     </div>
     <div style="display:flex;gap:12px;flex-wrap:wrap;">
-      <a class="sheets-link" href="https://docs.google.com/spreadsheets/d/1JkbHuzNIqgBpLE7kNGu_YYYpvwJEZpn_UUjAhZNuI1Y/edit" target="_blank" rel="noopener">
+      <a class="sheets-link" href="https://docs.google.com/spreadsheets/d/1ExOw5i_-Ue5YwSZr5EvPgzIfQ0ZurN4ky9GLqx8R97M/edit" target="_blank" rel="noopener">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         開啟 Google 試算表
       </a>
@@ -855,6 +906,7 @@ let taskChecks = {}; // {key: true/false}
 let taskNotes = {};  // {key: string}
 let timeSpent = {};  // {day: minutes}
 let lifeTodos = {};  // {day: [{text, done}]}
+let customTasks = {}; // {monthDay: [{text, brand, done}]} e.g. {'4_3': [{text:'寫文案', brand:'zy', done:false}]}
 let monthGoals = []; // [{id, title, brand, month, steps: [{text, day, done}]}]
 let yearGoals = []; // [{id, title, brand, steps: [{text, month, day, done}]}]
 let selectedCalMonth = 4; // 行事曆目前顯示月份
@@ -1009,24 +1061,57 @@ async function fetchSheetData() {
 
 // === TASK SYNC ===
 async function loadTaskChecks() {
-  // Try Apps Script first, fallback to localStorage
-  if (APPS_SCRIPT_URL) {
-    try {
-      const res = await fetch(APPS_SCRIPT_URL + '?action=getTasks');
-      const data = await res.json();
-      taskChecks = data;
-      localStorage.setItem('taskChecks', JSON.stringify(taskChecks));
-    } catch(e) { console.warn('Apps Script fetch failed, using localStorage'); }
-  }
-  if (Object.keys(taskChecks).length === 0) {
-    try { taskChecks = JSON.parse(localStorage.getItem('taskChecks') || '{}'); } catch(e) {}
-  }
+  // Load from localStorage first (instant)
+  try { taskChecks = JSON.parse(localStorage.getItem('taskChecks') || '{}'); } catch(e) {}
   try { timeSpent = JSON.parse(localStorage.getItem('timeSpent') || '{}'); } catch(e) {}
   try { taskNotes = JSON.parse(localStorage.getItem('taskNotes') || '{}'); } catch(e) {}
   try { lifeTodos = JSON.parse(localStorage.getItem('lifeTodos') || '{}'); } catch(e) {}
+  try { customTasks = JSON.parse(localStorage.getItem('customTasks') || '{}'); } catch(e) {}
   try { monthGoals = JSON.parse(localStorage.getItem('monthGoals') || '[]'); } catch(e) {}
   try { yearGoals = JSON.parse(localStorage.getItem('yearGoals') || '[]'); } catch(e) {}
+
+  // Then try Apps Script for cloud data
+  if (APPS_SCRIPT_URL) {
+    try {
+      const [tasksRes, dataRes] = await Promise.all([
+        fetch(APPS_SCRIPT_URL + '?action=getTasks'),
+        fetch(APPS_SCRIPT_URL + '?action=getData')
+      ]);
+      const tasks = await tasksRes.json();
+      const cloudData = await dataRes.json();
+      if (tasks && typeof tasks === 'object' && !tasks.error) {
+        taskChecks = tasks;
+        localStorage.setItem('taskChecks', JSON.stringify(taskChecks));
+      }
+      if (cloudData && typeof cloudData === 'object' && !cloudData.error) {
+        if (cloudData.taskNotes) { taskNotes = cloudData.taskNotes; localStorage.setItem('taskNotes', JSON.stringify(taskNotes)); }
+        if (cloudData.timeSpent) { timeSpent = cloudData.timeSpent; localStorage.setItem('timeSpent', JSON.stringify(timeSpent)); }
+        if (cloudData.lifeTodos) { lifeTodos = cloudData.lifeTodos; localStorage.setItem('lifeTodos', JSON.stringify(lifeTodos)); }
+        if (cloudData.customTasks) { customTasks = cloudData.customTasks; localStorage.setItem('customTasks', JSON.stringify(customTasks)); }
+        if (cloudData.monthGoals) { monthGoals = cloudData.monthGoals; localStorage.setItem('monthGoals', JSON.stringify(monthGoals)); }
+        if (cloudData.yearGoals) { yearGoals = cloudData.yearGoals; localStorage.setItem('yearGoals', JSON.stringify(yearGoals)); }
+      }
+    } catch(e) { console.warn('Apps Script fetch failed, using localStorage'); }
+  }
   autoCarryTasks();
+}
+
+function syncToCloud(key, value) {
+  if (!APPS_SCRIPT_URL) return;
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({action: 'saveData', key: key, value: value})
+  }).catch(e => console.warn('Cloud sync failed:', e));
+}
+
+function syncToCalendar(title, brand, month, day) {
+  if (!APPS_SCRIPT_URL) return;
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({action: 'createCalendarEvent', title, brand, year: 2026, month, day})
+  }).catch(e => console.warn('Calendar sync failed:', e));
 }
 
 async function toggleTaskCheck(key, el) {
@@ -1058,6 +1143,7 @@ function saveTimeSpent(day, brand, minutes) {
   }
   timeSpent[day][brand] = minutes;
   localStorage.setItem('timeSpent', JSON.stringify(timeSpent));
+  syncToCloud('timeSpent', timeSpent);
   // Update day total display
   const totalEl = document.getElementById('dayTimeTotal');
   if (totalEl) {
@@ -1124,34 +1210,74 @@ function getCarriedTasks(day) {
 function saveNote(key, value) {
   taskNotes[key] = value;
   localStorage.setItem('taskNotes', JSON.stringify(taskNotes));
+  syncToCloud('taskNotes', taskNotes);
 }
 
 // === LIFE TODOS ===
 function addLifeTodo(day) {
   const input = document.getElementById('lifeInput_' + day);
   if (!input || !input.value.trim()) return;
+  const text = input.value.trim();
   if (!lifeTodos[day]) lifeTodos[day] = [];
-  lifeTodos[day].push({text: input.value.trim(), done: false});
+  lifeTodos[day].push({text, done: false});
   localStorage.setItem('lifeTodos', JSON.stringify(lifeTodos));
-  showDay(day); // Re-render
+  syncToCloud('lifeTodos', lifeTodos);
+  syncToCalendar(text, 'life', selectedDayMonth || 4, day);
+  showDay(day);
 }
 
 function toggleLifeTodo(day, index) {
   if (!lifeTodos[day] || !lifeTodos[day][index]) return;
   lifeTodos[day][index].done = !lifeTodos[day][index].done;
   localStorage.setItem('lifeTodos', JSON.stringify(lifeTodos));
+  syncToCloud('lifeTodos', lifeTodos);
 }
 
 function removeLifeTodo(day, index) {
   if (!lifeTodos[day]) return;
   lifeTodos[day].splice(index, 1);
   localStorage.setItem('lifeTodos', JSON.stringify(lifeTodos));
+  syncToCloud('lifeTodos', lifeTodos);
   showDay(day);
 }
 
+// === CUSTOM TASKS ===
+function addCustomTask(day, month) {
+  const key = month + '_' + day;
+  const input = document.getElementById('customTaskInput_' + key);
+  const brandEl = document.getElementById('customTaskBrand_' + key);
+  if (!input || !input.value.trim()) return;
+  const text = input.value.trim();
+  const brand = brandEl.value;
+  if (!customTasks[key]) customTasks[key] = [];
+  customTasks[key].push({text, brand, done: false});
+  localStorage.setItem('customTasks', JSON.stringify(customTasks));
+  syncToCloud('customTasks', customTasks);
+  syncToCalendar(text, brand, month, day);
+  input.value = '';
+  showDay(day, month);
+}
+
+function toggleCustomTask(day, month, index) {
+  const key = month + '_' + day;
+  if (!customTasks[key] || !customTasks[key][index]) return;
+  customTasks[key][index].done = !customTasks[key][index].done;
+  localStorage.setItem('customTasks', JSON.stringify(customTasks));
+  syncToCloud('customTasks', customTasks);
+}
+
+function removeCustomTask(day, month, index) {
+  const key = month + '_' + day;
+  if (!customTasks[key]) return;
+  customTasks[key].splice(index, 1);
+  localStorage.setItem('customTasks', JSON.stringify(customTasks));
+  syncToCloud('customTasks', customTasks);
+  showDay(day, month);
+}
+
 // === GOALS ===
-function saveGoals() { localStorage.setItem('monthGoals', JSON.stringify(monthGoals.map(g => { const c = {...g}; delete c.expanding; return c; }))); }
-function saveYearGoals() { localStorage.setItem('yearGoals', JSON.stringify(yearGoals.map(g => { const c = {...g}; delete c.expanding; return c; }))); }
+function saveGoals() { const clean = monthGoals.map(g => { const c = {...g}; delete c.expanding; return c; }); localStorage.setItem('monthGoals', JSON.stringify(clean)); syncToCloud('monthGoals', clean); }
+function saveYearGoals() { const clean = yearGoals.map(g => { const c = {...g}; delete c.expanding; return c; }); localStorage.setItem('yearGoals', JSON.stringify(clean)); syncToCloud('yearGoals', clean); }
 
 let selectedGoalMonth = CURRENT_MONTH >= 4 && CURRENT_MONTH <= 6 ? CURRENT_MONTH : 4;
 let activeGoalTab = 'year';
@@ -1993,6 +2119,67 @@ function showDay(day, month) {
   }
   html += '</div>';
 
+  // === 今日行程時間軸 ===
+  const timeEvents = events.filter(e => e.type === 'event' || e.type === 'milestone');
+  if (timeEvents.length > 0) {
+    html += '<div class="day-timeline">';
+    html += '<div class="day-timeline-title">今日行程</div>';
+    timeEvents.forEach(e => {
+      const timeMatch = e.name.match(/(\d{1,2}:\d{2}(?:\s*-\s*\d{1,2}:\d{2})?)/);
+      const time = timeMatch ? timeMatch[1] : '全天';
+      const label = e.name.replace(/\s*\d{1,2}:\d{2}(?:\s*-\s*\d{1,2}:\d{2})?\s*/, ' ').trim();
+      html += `<div class="timeline-item">
+        <div class="timeline-time">${time}</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-label">${escapeHtml(label)}</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  // === 新增任務（置頂）===
+  const ctKey = month + '_' + day;
+  const cts = (customTasks[ctKey] || []).filter(t => {
+    if (viewMode === 'zy') return t.brand === 'zy' || t.brand === 'star';
+    if (viewMode === 'private') return t.brand === 'personal' || t.brand === 'star' || t.brand === 'life';
+    return true;
+  });
+  const brandNames = {star: '初星群', zy: '智堯', personal: '青青', life: '生活'};
+  const brandColorMap = {star: 'var(--star-primary)', zy: 'var(--zy-primary)', personal: 'var(--personal-primary)', life: 'var(--life-primary)'};
+  html += `<div style="background:linear-gradient(135deg, rgba(184,146,74,0.06) 0%, rgba(184,146,74,0.02) 100%);border:1.5px dashed rgba(184,146,74,0.3);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;">`;
+  html += `<div style="font-size:0.88rem;font-weight:600;color:var(--star-primary);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+    <span style="font-size:1rem;">+</span> 新增今日任務</div>`;
+  html += `<div class="life-input-row" style="margin-bottom:0;">
+    <select id="customTaskBrand_${ctKey}" style="padding:8px 10px;border:1.5px solid rgba(184,146,74,0.25);border-radius:8px;font-family:inherit;font-size:0.82rem;color:var(--text-dark);background:white;outline:none;">
+      ${viewMode !== 'private' ? '<option value="zy">智堯</option>' : ''}
+      ${viewMode !== 'zy' ? '<option value="personal">青青</option>' : ''}
+      <option value="star">初星群</option>
+      ${viewMode !== 'zy' ? '<option value="life">生活</option>' : ''}
+    </select>
+    <input type="text" class="life-input" id="customTaskInput_${ctKey}" placeholder="輸入任務內容..." onkeydown="if(event.key==='Enter')addCustomTask(${day},${month})" style="flex:1;border-color:rgba(184,146,74,0.25);">
+    <button class="life-add-btn" onclick="addCustomTask(${day},${month})">+</button>
+  </div>`;
+  html += '</div>';
+
+  // Helper: render custom tasks for a specific brand
+  const allCts = customTasks[ctKey] || [];
+  function renderCustomTasksForBrand(brand) {
+    let h = '';
+    allCts.forEach((ct, realIdx) => {
+      if (ct.brand !== brand) return;
+      if (viewMode === 'zy' && brand !== 'zy' && brand !== 'star') return;
+      if (viewMode === 'private' && brand === 'zy') return;
+      h += `<div class="task-check-wrap" style="display:flex;align-items:center;">
+        <label class="task-check${ct.done ? ' done' : ''}" style="flex:1;">
+          <input type="checkbox" ${ct.done ? 'checked' : ''} onchange="toggleCustomTask(${day},${month},${realIdx});this.closest('.task-check').classList.toggle('done',this.checked)">
+          <div class="task-check-label">${escapeHtml(ct.text)}<span style="color:var(--text-light);font-size:0.7rem;margin-left:6px;">自訂</span></div>
+        </label>
+        <button onclick="removeCustomTask(${day},${month},${realIdx})" style="background:none;border:none;color:var(--text-light);cursor:pointer;font-size:0.75rem;padding:4px 8px;opacity:0.5;">&times;</button>
+      </div>`;
+    });
+    return h;
+  }
+
   // === TASKS - Unified card ===
   html += '<div class="day-card" style="padding:0;overflow:hidden;">';
 
@@ -2001,33 +2188,44 @@ function showDay(day, month) {
 
   let secCarried = '';
   if (carried.length > 0) {
-    secCarried += sec();
-    secCarried += '<div class="day-card-title" style="color:#E65100;">昨日延後</div>';
+    secCarried += '<div class="task-overdue" style="padding:20px 20px 8px;border-bottom:1px solid rgba(211,47,47,0.1);">';
+    secCarried += '<div class="day-card-title" style="color:#D32F2F;">昨日延後<span class="overdue-badge">urgent</span></div>';
     carried.forEach((task, i) => { secCarried += taskCheckHTML(`${day}_carry_${i}`, task, '', true); });
     secCarried += '</div>';
   }
 
   let secStar = '';
-  if (events.length > 0) {
+  const starCustom = renderCustomTasksForBrand('star');
+  if (events.length > 0 || starCustom) {
     secStar += sec();
     secStar += '<div class="day-card-title" style="color:var(--star-primary);">初星群</div>';
     events.filter(e => e.type !== 'ongoing').forEach((e,i) => { secStar += taskCheckHTML(`${day}_event_${i}`, e.name, '', true); });
     events.filter(e => e.type === 'ongoing').forEach(e => {
       secStar += `<div style="font-size:0.82rem;padding:6px 12px;color:var(--text-light);">${e.name}</div>`;
     });
+    secStar += starCustom;
     secStar += '</div>';
   }
 
   let secZy = '';
   if (viewMode !== 'private') {
+    const zyTaskKeys = [`${day}_zy_threads`, ...ig.filter(t=>t.brand==='zy').map((_,i)=>`${day}_ig_${i}`)];
+    const zyAllDone = zyTaskKeys.length > 0 && zyTaskKeys.every(k => isChecked(k));
+    const zyDoneCount = zyTaskKeys.filter(k => isChecked(k)).length;
     secZy += sec();
     secZy += '<div class="day-card-title" style="color:var(--zy-primary);">智堯';
     if (dayData) secZy += ` <span class="status-badge ${statusClass(dayData.zyStatus)}">${dayData.zyStatus}</span>`;
     secZy += '</div>';
+    if (zyAllDone) {
+      secZy += `<button class="done-collapse-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('span').textContent=this.nextElementSibling.style.display==='none'?'展開':'收起';" style="color:var(--zy-primary);">全部完成 ✓ <span>展開</span></button>`;
+      secZy += '<div style="display:none;">';
+    }
     secZy += taskCheckHTML(`${day}_zy_threads`, 'Threads 脆文', 'zy-check', true);
     ig.filter(t => t.brand === 'zy').forEach((t,i) => {
       secZy += taskCheckHTML(`${day}_ig_${i}`, t.task, 'zy-check', true);
     });
+    secZy += renderCustomTasksForBrand('zy');
+    if (zyAllDone) secZy += '</div>';
     if (dayData && dayData.zyCopy) {
       secZy += `<div class="copy-text" style="margin:4px 12px 12px;">${escapeHtml(dayData.zyCopy)}</div>`;
     }
@@ -2036,15 +2234,24 @@ function showDay(day, month) {
 
   let secPersonal = '';
   if (viewMode !== 'zy') {
+    const pTaskKeys = [`${day}_personal_threads`, ...ig.filter(t=>t.brand==='personal').map((_,i)=>{const idx=ig.indexOf(ig.filter(t2=>t2.brand==='personal')[i]);return `${day}_ig_${idx}`;})];
+    const pAllDone = pTaskKeys.length > 0 && pTaskKeys.every(k => isChecked(k));
+    const pDoneCount = pTaskKeys.filter(k => isChecked(k)).length;
     secPersonal += sec();
     secPersonal += '<div class="day-card-title" style="color:var(--personal-primary);">青青品牌';
     if (dayData) secPersonal += ` <span class="status-badge ${statusClass(dayData.personalStatus)}">${dayData.personalStatus}</span>`;
     secPersonal += '</div>';
+    if (pAllDone) {
+      secPersonal += `<button class="done-collapse-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('span').textContent=this.nextElementSibling.style.display==='none'?'展開':'收起';" style="color:var(--personal-primary);">全部完成 ✓ <span>展開</span></button>`;
+      secPersonal += '<div style="display:none;">';
+    }
     secPersonal += taskCheckHTML(`${day}_personal_threads`, 'Threads 脆文', 'personal-check', true);
     ig.filter(t => t.brand === 'personal').forEach((t,i) => {
       const idx = ig.indexOf(t);
       secPersonal += taskCheckHTML(`${day}_ig_${idx}`, t.task, 'personal-check', true);
     });
+    secPersonal += renderCustomTasksForBrand('personal');
+    if (pAllDone) secPersonal += '</div>';
     if (dayData && dayData.personalCopy) {
       secPersonal += `<div class="copy-text" style="margin:4px 12px 12px;">${escapeHtml(dayData.personalCopy)}</div>`;
     }
@@ -2061,11 +2268,42 @@ function showDay(day, month) {
     html += secStar + secZy + secPersonal;
   }
 
+  // Brand completion celebrations
+  const encouragements = ['太棒了！繼續保持', '今日份的努力完成了', '效率滿分', '做得好！休息一下吧'];
+  const randEnc = () => encouragements[Math.floor(Math.random() * encouragements.length)];
+  if (viewMode !== 'private') {
+    const zyKeys = [`${day}_zy_threads`, ...ig.filter(t=>t.brand==='zy').map((_,i)=>`${day}_ig_${i}`)];
+    if (zyKeys.length > 0 && zyKeys.every(k => isChecked(k))) {
+      html += `<div class="brand-complete"><span style="font-size:1.2rem;">&#10003;</span><div class="brand-complete-text" style="color:var(--zy-primary);">智堯任務全部完成！${randEnc()}</div></div>`;
+    }
+  }
+  if (viewMode !== 'zy') {
+    const pKeys = [`${day}_personal_threads`, ...ig.filter(t=>t.brand==='personal').map((_,i)=>{const idx=ig.indexOf(_);return `${day}_ig_${idx}`;})];
+    if (pKeys.length > 0 && pKeys.every(k => isChecked(k))) {
+      html += `<div class="brand-complete"><span style="font-size:1.2rem;">&#10003;</span><div class="brand-complete-text" style="color:var(--personal-primary);">青青任務全部完成！${randEnc()}</div></div>`;
+    }
+  }
+
   // Section: 預先準備
   if (prep.length > 0) {
+    const prepDoneCount = prep.filter((_,i) => isChecked(`${day}_prep_${i}`)).length;
+    const prepAllDone = prepDoneCount === prep.length;
     html += '<div style="padding:20px 20px 8px;border-bottom:1px solid rgba(184,146,74,0.08);">';
     html += '<div class="day-card-title" style="color:var(--text-mid);">準備事項</div>';
-    prep.forEach((p,i) => { html += taskCheckHTML(`${day}_prep_${i}`, p, '', true); });
+    if (prepAllDone) {
+      html += `<div class="brand-complete" style="margin:0 0 8px;"><span style="font-size:1.2rem;">&#10003;</span><div class="brand-complete-text">準備事項全部完成！</div></div>`;
+    } else {
+      prep.forEach((p,i) => {
+        const done = isChecked(`${day}_prep_${i}`);
+        if (!done) html += taskCheckHTML(`${day}_prep_${i}`, p, '', true);
+      });
+      if (prepDoneCount > 0) {
+        html += `<button class="done-collapse-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('span').textContent=this.nextElementSibling.style.display==='none'?'展開':'收起';">已完成 ${prepDoneCount} 項 <span>展開</span></button>`;
+        html += '<div style="display:none;">';
+        prep.forEach((p,i) => { if (isChecked(`${day}_prep_${i}`)) html += taskCheckHTML(`${day}_prep_${i}`, p, '', true); });
+        html += '</div>';
+      }
+    }
     html += '</div>';
   }
 
@@ -2109,19 +2347,20 @@ function showDay(day, month) {
       </div>`;
     });
   }
+  html += renderCustomTasksForBrand('life');
   html += '</div>';
   } // end if viewMode !== 'zy'
 
   // === 今日時間 ===
   const zyTime = getTime(day, 'zy'), pTime = getTime(day, 'personal'), starTime = getTime(day, 'star');
   const dayTotal = getDayTotal(day);
-  const tis = 'width:44px;padding:4px;border:1px solid var(--border);border-radius:6px;font-size:0.8rem;font-weight:600;text-align:center;font-family:inherit;color:var(--text-dark);background:var(--bg);outline:none;';
+  const tis = 'width:52px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;font-size:0.8rem;font-weight:600;text-align:center;font-family:inherit;color:var(--text-dark);background:var(--bg);outline:none;-moz-appearance:textfield;';
   html += '<div class="day-card" style="padding:16px 20px;">';
   html += `<div style="font-size:0.82rem;font-weight:600;color:var(--text-dark);margin-bottom:10px;">今日花費 <span style="font-weight:400;color:var(--text-light);">${dayTotal} 分鐘</span></div>`;
   html += '<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;">';
-  if (viewMode !== 'private') html += `<div style="display:flex;align-items:center;gap:5px;"><span class="brand-dot zy"></span><input type="number" min="0" max="480" value="${zyTime||''}" placeholder="0" style="${tis}" onchange="saveTimeSpent(${day},'zy',this.value?parseInt(this.value):0)"><span style="font-size:0.72rem;color:var(--text-light);">分</span></div>`;
-  if (viewMode !== 'zy') html += `<div style="display:flex;align-items:center;gap:5px;"><span class="brand-dot personal"></span><input type="number" min="0" max="480" value="${pTime||''}" placeholder="0" style="${tis}" onchange="saveTimeSpent(${day},'personal',this.value?parseInt(this.value):0)"><span style="font-size:0.72rem;color:var(--text-light);">分</span></div>`;
-  html += `<div style="display:flex;align-items:center;gap:5px;"><span class="brand-dot star"></span><input type="number" min="0" max="480" value="${starTime||''}" placeholder="0" style="${tis}" onchange="saveTimeSpent(${day},'star',this.value?parseInt(this.value):0)"><span style="font-size:0.72rem;color:var(--text-light);">分</span></div>`;
+  if (viewMode !== 'private') html += `<div style="display:flex;align-items:center;gap:5px;"><span class="brand-dot zy"></span><input type="number" min="0" max="999" value="${zyTime||''}" placeholder="0" class="task-time-input" style="${tis}" onchange="saveTimeSpent(${day},'zy',this.value?parseInt(this.value):0)"><span style="font-size:0.72rem;color:var(--text-light);">分</span></div>`;
+  if (viewMode !== 'zy') html += `<div style="display:flex;align-items:center;gap:5px;"><span class="brand-dot personal"></span><input type="number" min="0" max="999" value="${pTime||''}" placeholder="0" class="task-time-input" style="${tis}" onchange="saveTimeSpent(${day},'personal',this.value?parseInt(this.value):0)"><span style="font-size:0.72rem;color:var(--text-light);">分</span></div>`;
+  html += `<div style="display:flex;align-items:center;gap:5px;"><span class="brand-dot star"></span><input type="number" min="0" max="999" value="${starTime||''}" placeholder="0" class="task-time-input" style="${tis}" onchange="saveTimeSpent(${day},'star',this.value?parseInt(this.value):0)"><span style="font-size:0.72rem;color:var(--text-light);">分</span></div>`;
   html += '</div></div>';
 
   html += '</div>';
